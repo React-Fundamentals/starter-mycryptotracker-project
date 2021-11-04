@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Redirect, Route, Switch } from "react-router-dom";
 
 import {
@@ -15,8 +16,27 @@ import { headerContainer, mainContainer } from "./layout.module.css";
 import Navigation from "./navigation";
 import Header from "./header";
 import Footer from "./footer";
+import RouteWithErrorBoundary from "./route-with-error-boundary";
 
 export default function Layout() {
+  const [favorite, setFavorite] = useState({});
+
+  function handleFavoriteChange({
+    originalAssetId,
+    name,
+    imageUrl,
+    type,
+    assetContractAddress,
+  }) {
+    setFavorite({
+      originalAssetId,
+      name,
+      imageUrl,
+      type,
+      assetContractAddress,
+    });
+  }
+
   return (
     <>
       <div className={headerContainer}>
@@ -29,29 +49,29 @@ export default function Layout() {
             <Redirect to="/coins" />
           </Route>
 
-          <Route exact path="/coins">
+          <RouteWithErrorBoundary exact path="/coins">
             <CoinsList />
-          </Route>
-          <Route path="/coins/:id">
-            <CoinView />
-          </Route>
+          </RouteWithErrorBoundary>
+          <RouteWithErrorBoundary path="/coins/:id">
+            <CoinView handleFavoriteChange={handleFavoriteChange} />
+          </RouteWithErrorBoundary>
 
-          <Route exact path="/collectibles">
+          <RouteWithErrorBoundary exact path="/collectibles">
             <CollectiblesList />
-          </Route>
-          <Route path="/collectibles/:id">
+          </RouteWithErrorBoundary>
+          <RouteWithErrorBoundary path="/collectibles/:id">
             <CollectibleView />
-          </Route>
+          </RouteWithErrorBoundary>
 
-          <Route exact path="/favorites">
+          <RouteWithErrorBoundary exact path="/favorites">
             <FavoritesList />
-          </Route>
-          <Route path="/favorites/new">
-            <FavoriteCreate />
-          </Route>
-          <Route path="/favorites/:id/edit">
+          </RouteWithErrorBoundary>
+          <RouteWithErrorBoundary path="/favorites/new">
+            <FavoriteCreate favorite={favorite} />
+          </RouteWithErrorBoundary>
+          <RouteWithErrorBoundary path="/favorites/:id/edit">
             <FavoriteEdit />
-          </Route>
+          </RouteWithErrorBoundary>
 
           <Route path="*">
             <NoMatch />
